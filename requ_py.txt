@@ -53,7 +53,7 @@ nvidia-cudnn-cu12
 oauthlib==3.2.2
 od==2.0.2
 onnx==1.16.1
-onnxoptimizer==0.3.13
+onnxoptimizer==0.4.2
 onnxruntime==1.17.1
 onnxsim==0.4.36
 opencv-python==4.10.0.84
