@@ -2,7 +2,7 @@ absl-py==2.0.0
 addict==2.4.0
 albucore==0.0.12
 albumentations==1.0.1
-annotated-types==0.6.0
+annotated-types==0.7.0
 asttokens==2.4.1
 attrs==23.2.0
 bitarray==2.9.2
