@@ -1,0 +1,48 @@
+# Parameters
+nc: 3  # number of classes
+ch: 5
+depth_multiple: 1.0
+width_multiple: 1.0
+
+# Two detector scales only:
+# - P4/16: small objects
+# - P5/32: medium objects
+# Re-run auto-anchor/k-means on your dataset after this structural change.
+anchors:
+  - [6, 8, 10, 14, 16, 24]      # small, P3/8 or P4/16
+  - [24, 32, 36, 48, 48, 64]    # P5/32 medium
+
+quantize: True
+quant_bit_width: 4
+act_bit_width: 4
+first_layer_bit_width: 8
+detect_bit_width: 4
+
+backbone:
+  # [from, number, module, args]
+  [
+    [-1, 1, Conv, [16, 5, 1]],  # 0
+    [-1, 1, nn.MaxPool2d, [2, 2, 0]],                                                         # 1-P1/2
+
+    [-1, 1, Conv, [24, 3, 1]],                                 # 2
+    [-1, 1, nn.MaxPool2d, [2, 2, 0]],                                                          # 3-P2/4
+
+    [-1, 1, Conv, [40, 3, 1]],                                 # 4
+    [-1, 1, nn.MaxPool2d, [2, 2, 0]],                                                          # 5-P3/8
+
+    [-1, 1, Conv, [64, 3, 1]],                                 # 6
+    [-1, 1, nn.MaxPool2d, [2, 2, 0]],                                                          # 7-P4/16
+
+    [-1, 1, Conv, [80, 3, 1]],                                 # 8 P4 feature
+  ]
+head:
+  [
+    [8, 1, Conv, [24, 1, 1]],                                  # 9  P4 small prediction
+
+    [8, 1, nn.MaxPool2d, [2, 2, 0]],                                                           # 10-P5/32
+    [-1, 1, Conv, [96, 3, 1]],                                 # 11
+    [-1, 1, Conv, [96, 3, 1]],                                 # 12 P5 feature
+    [-1, 1, Conv, [24, 1, 1]],                                 # 13 P5 medium prediction
+
+    [[9, 13], 1, Detect, [nc, anchors]],                                                       # 14
+  ]

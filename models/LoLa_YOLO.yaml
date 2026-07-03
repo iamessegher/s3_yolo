@@ -1,0 +1,46 @@
+# Parameters
+nc: 3
+ch: 3
+depth_multiple: 1.0
+width_multiple: 1.0
+
+# Quantization switch defaults. CLI can override these.
+quantize: False
+quant_bit_width: 4
+act_bit_width: 4
+first_layer_bit_width: 8
+detect_bit_width: 4
+
+anchors:
+  - [10, 14, 23, 27, 37, 58]  # P4/16
+  - [81, 82, 135, 169, 344, 319]  # P5/32
+
+# YOLOv3-tiny backbone
+backbone:
+  # [from, number, module, args]
+  [
+    [-1, 1, Conv, [16, 3, 1]],  # 0
+    [-1, 1, nn.MaxPool2d, [2, 2, 0]],  # 1-P1/2
+    [-1, 1, Conv, [32, 3, 1]],  # 2
+    [-1, 1, nn.MaxPool2d, [2, 2, 0]],  # 3-P2/4
+    [-1, 1, Conv, [64, 3, 1]],  # 4
+    [-1, 1, nn.MaxPool2d, [2, 2, 0]],  # 5-P3/8
+    [-1, 1, Conv, [128, 3, 1]], # 6
+    [-1, 1, nn.MaxPool2d, [2, 2, 0]],  # 7-P4/16
+    [-1, 1, Conv, [128, 3, 1]], # 8
+    [-1, 1, nn.MaxPool2d, [2, 2, 0]],  # 9-P5/32
+    [-1, 1, Conv, [128, 3, 1]], # 10
+    [-1, 1, Conv, [128, 3, 1]], # 11
+    [-1, 1, Conv, [195, 1, 1]], # 12
+  ]
+
+# YOLOv3-tiny head
+head:
+  [
+    [-1, 1, Conv, [128, 1, 1]],  # 13
+    [-1, 1, Conv, [128, 1, 1]], # 14
+    [-1, 1, nn.Upsample, [None, 2, 'nearest']],  # 15
+    [[-1, 8], 1, Concat, [1]],  # 16
+    [-1, 1, Conv, [195, 1, 1]],  # 17
+    [[15, 13], 1, Detect, [nc, anchors]],  # 18
+  ]

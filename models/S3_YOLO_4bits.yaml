@@ -1,0 +1,40 @@
+# Parameters
+nc: 3  # number of classes
+ch: 5
+depth_multiple: 1.0  # model depth multiple
+width_multiple: 1.0  # layer channel multiple
+anchors:
+  - [6, 8, 10, 14, 16, 24]      # small, P3/8 or P4/16
+  - [24, 32, 36, 48, 48, 64]    # P5/32 medium
+bit_width:
+  - [8, 8, 8, 8]  # in_weight_bit_width, in_act_bit_width, weight_bit_width, act_bit_width, out_weight_bit_width
+
+# YOLOv3-tiny backbone
+backbone:
+  # [from, number, module, args]
+  [
+    [-1, 1, QuantConv, [16, 5, 1, None, 1, True, True, in_weight_bit_width, act_bit_width]],  # 0
+    [-1, 1, nn.MaxPool2d, [2, 2, 0]],  # 1-P1/2
+    [-1, 1, QuantConv, [32, 3, 1, None, 1, True, True, 4, 4]],  # 2
+    [-1, 1, nn.MaxPool2d, [2, 2, 0]],  # 3-P2/4
+    [-1, 1, QuantConv, [64, 3, 1, None, 1, True, True, 4, 4]],  # 4
+    [-1, 1, nn.MaxPool2d, [2, 2, 0]],  # 5-P3/8
+    [-1, 1, QuantConv, [128, 3, 1, None, 1, True, True, 4, 4]], # 6
+    [-1, 1, nn.MaxPool2d, [2, 2, 0]],  # 7-P4/16
+    [-1, 1, QuantConv, [128, 3, 1, None, 1, True, True, 4, 4]], # 8
+    [-1, 1, nn.MaxPool2d, [2, 2, 0]],  # 9-P5/32
+    [-1, 1, QuantConv, [128, 3, 1, None, 1, True, True, 4, 4]], # 10
+    [-1, 1, QuantConv, [128, 3, 1, None, 1, True, True, 4, 4]], # 11
+    [-1, 1, QuantConv, [24, 1, 1, None, 1, True, True, 4, 4]], # 12
+  ]
+
+# YOLOv3-tiny head
+head:
+  [
+    [-1, 1, QuantConv, [128, 1, 1, None, 1, True, True, 4, 4]],  # 13
+    [-1, 1, QuantConv, [128, 1, 1, None, 1, True, True, 4, 4]], # 14
+    [-1, 1, nn.Upsample, [None, 2, 'nearest']],  # 15
+    [[-1, 8], 1, EventConcat, [1]],  # 16
+    [-1, 1, QuantConv, [24, 1, 1, None, 1, True, True, 4, 4]],  # 17
+    [[15, 13], 1, Detect, [nc, anchors]],  # 18
+  ]

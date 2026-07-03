@@ -1,0 +1,13 @@
+# ### eTRAM DAY ###
+
+
+# train: /PATH/TO/DATASET/train.txt
+# val:  /PATH/TO/DATASET/val.txt
+
+#### Etram ####
+nc: 3
+# Classes
+names:
+  0: pedestrian
+  1: vehicle
+  2: micromobility

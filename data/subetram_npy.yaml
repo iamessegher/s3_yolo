@@ -1,0 +1,11 @@
+# ### eTRAM DAY SUBSET NPY ###
+train: /Brain/private/i22amess/Datasets/eTRAM/elola_subset/train.txt  # 118287 images
+val:  /Brain/private/i22amess/Datasets/eTRAM/elola_subset/val.txt  # 5000 images
+
+#### Etram ####
+nc: 3
+# Classes
+names:
+  0: pedestrian
+  1: vehicle
+  2: micromobility
